@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  attempts     UserAttempt[]
+  topicStats   TopicStats[]
+  hintSessions HintSession[]
+}
+
+model Problem {
+  id          String       @id @default(cuid())
+  title       String
+  bodyLatex   String
+  solutionLatex String
+  competition String
+  year        Int?
+  difficulty  Int          // 1 (easy) to 5 (very hard)
+  topics      String[]     // e.g. ["algebra", "number_theory"]
+  answerType  AnswerType   @default(NUMERIC)
+  answer      String       // stored as string to support both integers and multiple choice
+  bodyDiagrams     String[] @default([]) // pre-rendered PNG data URIs for [asy] blocks in bodyLatex, in order
+  solutionDiagrams String[] @default([]) // pre-rendered PNG data URIs for [asy] blocks in solutionLatex, in order
+  createdAt   DateTime     @default(now())
+  attempts    UserAttempt[]
+  hintSessions HintSession[]
+}
+
+model UserAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  problemId   String
+  solved      Boolean
+  timeSpentSec Int?
+  hintsUsed   Int      @default(0)
+  fullSolutionSeen Boolean @default(false)
+  submittedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+  problem     Problem  @relation(fields: [problemId], references: [id])
+}
+
+model TopicStats {
+  id             String   @id @default(cuid())
+  userId         String
+  topic          String
+  easeFactor     Float    @default(2.5)
+  intervalDays   Float    @default(1)
+  nextReviewDate DateTime @default(now())
+  repetitions    Int      @default(0)
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, topic])
+}
+
+model HintSession {
+  id               String   @id @default(cuid())
+  userId           String
+  problemId        String
+  hintsRequested   Int      @default(0)
+  fullSolutionShown Boolean @default(false)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id])
+  problem          Problem  @relation(fields: [problemId], references: [id])
+}
+
+enum AnswerType {
+  NUMERIC
+  MULTIPLE_CHOICE
+}

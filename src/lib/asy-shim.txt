@@ -1,0 +1,63 @@
+// Minimal original implementations of a few geometry helpers that some
+// competition diagrams assume (provided by AoPS's olympiad.asy/cse5.asy, which
+// are not bundled with Asymptote). Written from scratch from their definitions.
+// Each helper is tagged `// @name <fn>` so the renderer can include only the
+// ones a given snippet does not already define itself.
+
+// @name markscalefactor
+// Global tick/mark scale factor (cse5 global; some diagrams assign to it).
+real markscalefactor = 0.03;
+
+// @name foot
+// Foot of the perpendicular from P onto line AB.
+pair foot(pair P, pair A, pair B) {
+  pair d = B - A;
+  return A + dot(P - A, d) / dot(d, d) * d;
+}
+
+// @name rightanglemark
+// A small right-angle square drawn at vertex B, between rays BA and BC.
+// Size scales with the shorter adjacent ray so it looks right at any unitsize.
+path rightanglemark(pair A, pair B, pair C, real s = 8) {
+  pair u = unit(A - B);
+  pair v = unit(C - B);
+  real len = 0.10 * min(abs(A - B), abs(C - B)) * (s / 8);
+  return (B + len * u) -- (B + len * (u + v)) -- (B + len * v);
+}
+
+// @name IP
+// Intersection point of two paths.
+pair IP(path p, path q) {
+  return intersectionpoint(p, q);
+}
+
+// @name Tan
+// Degree-based tangent.
+real Tan(real deg) {
+  return tan(radians(deg));
+}
+
+// @name extend
+// A long line through A and B (used to "extend" a segment for intersections).
+path extend(pair A, pair B, real t = 100) {
+  pair d = unit(B - A);
+  return (A - t * d) -- (B + t * d);
+}
+
+// @name pathticks
+// n short perpendicular hash marks near the middle of a path, marking equal
+// lengths. Returns a picture to add() to the diagram.
+picture pathticks(path g, int n = 1, real r = 0.5, real spacing = 6, real s = 5) {
+  picture pic;
+  real mid = arclength(g) / 2;
+  real len = 0.08 * s;
+  real gap = 0.1 * spacing;
+  for (int i = 0; i < n; ++i) {
+    real off = (i - (n - 1) / 2) * gap;
+    real t = arctime(g, mid + off);
+    pair pt = point(g, t);
+    pair perp = rotate(90) * dir(g, t);
+    draw(pic, (pt - len * perp) -- (pt + len * perp));
+  }
+  return pic;
+}

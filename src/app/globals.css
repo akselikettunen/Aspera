@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
+/* ── Aspera design tokens ────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg:           #07111C;
+  --surface:      #0B1926;
+  --raised:       #0F2236;
+  --line:         #152336;
+  --accent:       #22D4E6;
+  --accent-hover: #1bbfcf;
+  --text:         #D6EEF4;
+  --sub:          #4A7088;
+
+  /* status colors used across feedback/difficulty UI */
+  --good:  #4ade80;
+  --warn:  #F5C842;
+  --bad:   #f87171;
+  --hard:  #fb923c;
 }
 
+/* Register tokens as Tailwind utilities (bg-bg, text-accent, border-line, …) */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-bg:           var(--bg);
+  --color-surface:      var(--surface);
+  --color-raised:       var(--raised);
+  --color-line:         var(--line);
+  --color-accent:       var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-text:         var(--text);
+  --color-sub:          var(--sub);
+  --color-good:         var(--good);
+  --color-warn:         var(--warn);
+  --color-bad:          var(--bad);
+  --color-hard:         var(--hard);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), "Inter", sans-serif;
 }
+
+/* KaTeX renders black by default — make it inherit our light text on the dark bg */
+.katex { color: var(--text); }
